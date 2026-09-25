@@ -4,7 +4,7 @@ import multer from 'multer';
 import { Prisma } from '@prisma/client';
 import { env } from './config/env';
 import { prisma } from './lib/prisma';
-import { uploadDocument, deleteDocument } from './lib/minio';
+import { uploadDocument, deleteDocument, ensureBucketExists } from './lib/minio';
 import { AppError, errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { RegistrationPayload, validateRegistration } from './business/registrationRules';
 
@@ -25,8 +25,13 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/health', async (_req, res, next) => {
-  try { await prisma.$queryRaw`SELECT 1`; res.json({ success: true, status: 'ok', dependencies: { database: 'ok' } }); }
-  catch (error) { next(new AppError(`Serviço indisponível: ${error instanceof Error ? error.message : 'database'}`, 503)); }
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    await ensureBucketExists(env.MINIO_BUCKET);
+    res.json({ success: true, status: 'ok', dependencies: { database: 'ok', minio: 'ok' } });
+  } catch (error) {
+    next(new AppError(`Serviço indisponível: ${error instanceof Error ? error.message : 'database ou MinIO'}`, 503));
+  }
 });
 
 async function findTeam(id: string) {

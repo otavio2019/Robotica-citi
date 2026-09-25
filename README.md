@@ -225,3 +225,37 @@ O MVP ainda não possui autenticação, painel administrativo, exportação, alt
 O cadastro atual contempla instituição/escola, equipe de garagem, técnico responsável e de 3 a 4 competidores. Para cada competidor, a identidade é obrigatória em PDF, JPG, JPEG ou PNG, com limite de 5 MB. Quando o código INEP da instituição não é informado, a equipe é classificada automaticamente como garagem.
 
 A instituição, o técnico, a equipe, os dados da etapa e os competidores são persistidos na mesma transação. O competidor responsável pelo marketing é opcional e fica associado à equipe quando selecionado.
+
+## Ligações do ambiente local
+
+A ligação entre as partes funciona assim:
+
+```text
+Frontend (localhost:3033) -> API Express (localhost:3339)
+                                  |-> PostgreSQL (localhost:5432)
+                                  |-> MinIO (localhost:9020)
+```
+
+Prepare o ambiente uma vez:
+
+```bash
+docker compose up -d --remove-orphans
+cp backend/.env.example backend/.env
+cp frontend/.env.local.example frontend/.env.local
+
+cd backend
+npm ci
+npm run prisma:generate
+npm run prisma:deploy
+npm run dev
+```
+
+Em outro terminal:
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+Verifique as ligações em `http://localhost:3339/health`. O retorno esperado contém `database: "ok"` e `minio: "ok"`. O formulário envia o campo JSON `data` e os quatro arquivos no campo multipart `documents`; a API grava os dados no PostgreSQL e as identidades no bucket `identidades` do MinIO.
