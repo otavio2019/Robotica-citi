@@ -1,0 +1,55 @@
+{
+  "name": "robotica-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "prepare": "prisma generate",
+    "lint": "eslint . --ext .ts",
+    "test": "vitest run",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:validate": "prisma validate --schema prisma/schema.prisma"
+  },
+  "keywords": [
+    "robotica",
+    "prisma",
+    "express",
+    "typescript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.1",
+    "express": "^5.2.1",
+    "minio": "^8.0.7",
+    "multer": "^2.4.0",
+    "uuid": "^14.0.2",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^22.15.30",
+    "@types/supertest": "^7.2.1",
+    "@typescript-eslint/eslint-plugin": "8.7.0",
+    "@typescript-eslint/parser": "8.7.0",
+    "eslint": "8.57.1",
+    "prisma": "^5.22.0",
+    "supertest": "^7.2.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.2",
+    "vitest": "^5.0.1"
+  },
+  "overrides": {
+    "decode-uri-component": "^0.5.0",
+    "stream-json": "^3.7.0"
+  }
+}

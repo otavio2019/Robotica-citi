@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Institution {
+  id           String                @id @default(cuid())
+  name         String
+  cnpj         String?               @unique
+  inepCode     String?               @unique
+  city         String?
+  instagramUrl String?
+  isPatos      Boolean               @default(false)
+  type         String                @default("EDUCATIONAL")
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  responsibles TechnicalResponsible[]
+  teams        Team[]
+}
+
+model TechnicalResponsible {
+  id            String       @id @default(cuid())
+  fullName      String
+  document      String?      @unique
+  inepCode      String?
+  institutionName String?
+  email         String       @unique
+  phone         String
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+  teams         Team[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+// institutionId nulo e isGarage=true representam equipes de garagem.
+model Team {
+  id                    String               @id @default(cuid())
+  name                  String
+  state                 String
+  city                  String
+  level                 String
+  modalities            String[]
+  memberCount           Int                  @default(4)
+  isGarage              Boolean              @default(false)
+  institutionId         String?
+  institution           Institution?         @relation(fields: [institutionId], references: [id])
+  responsibleId         String
+  responsible           TechnicalResponsible @relation(fields: [responsibleId], references: [id])
+  competitors           Competitor[]
+  marketingCompetitorId String?              @unique
+  marketingCompetitor   Competitor?          @relation("TeamMarketingCompetitor", fields: [marketingCompetitorId], references: [id])
+  acceptedDeclaration   Boolean              @default(false)
+  acceptedAt            DateTime?
+  stageName             String
+  stageState            String
+  stageVenue            String
+  competitionDate       DateTime
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@index([institutionId])
+  @@index([responsibleId])
+}
+
+model Competitor {
+  id            String   @id @default(cuid())
+  fullName      String
+  documentPath  String?
+  inepCode      String?
+  birthDate     DateTime
+  city          String
+  email         String
+  phone         String
+  teamId        String
+  team          Team     @relation(fields: [teamId], references: [id])
+  marketingTeam Team?    @relation("TeamMarketingCompetitor")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([teamId])
+}
