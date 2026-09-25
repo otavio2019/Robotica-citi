@@ -36,12 +36,7 @@ O frontend envia JSON para `POST /registrations`. O backend repete todas as vali
 
 O nível é conferido pela idade do integrante mais velho na data da competição:
 
-| Nível | Idade máxima do integrante mais velho |
-|---|---:|
-| Nível 1 | 9 anos |
-| Nível 2 | 11 anos |
-| Nível 3 | 14 anos |
-| Nível 4 | 19 anos |
+O nível foi removido do cadastro. Permanece apenas a validação de idade máxima de 19 anos para os competidores.
 
 As faixas devem ser confirmadas contra o regulamento oficial do TJR antes de uma publicação definitiva.
 
@@ -161,8 +156,7 @@ Payload mínimo:
     "name": "Equipe A",
     "state": "PB",
     "city": "Patos",
-    "level": "LEVEL_4",
-    "modalities": ["PISTA_RETA"]
+    "modalities": ["SEGUIR_LINHA"]
   },
   "competitors": [
     { "name": "Ana", "birthDate": "2010-01-10" },

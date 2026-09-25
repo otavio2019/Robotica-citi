@@ -1,13 +1,11 @@
 // Catálogo fechado compartilhado pelo contrato do cadastro TJR.
-export const TJR_MODALITIES = ['PISTA_RETA'] as const;
-export const TJR_LEVELS = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4'] as const;
-export type TjrLevel = (typeof TJR_LEVELS)[number];
+export const TJR_MODALITIES = ['SEGUIR_LINHA'] as const;
 export type Modality = (typeof TJR_MODALITIES)[number];
 export type RegistrationPayload = {
   stage?: { name?: string; state?: string; venue?: string; competitionDate?: string };
   institution?: { name?: string; cnpj?: string; inepCode?: string; city?: string; instagramUrl?: string; isPatos?: boolean };
   responsible?: { fullName?: string; document?: string; inepCode?: string; institutionName?: string; email?: string; phone?: string };
-  team?: { name?: string; state?: string; city?: string; level?: TjrLevel; modalities?: string[]; isGarage?: boolean; marketingCompetitorIndex?: number | null };
+  team?: { name?: string; state?: string; city?: string; modalities?: string[]; isGarage?: boolean; marketingCompetitorIndex?: number | null };
   competitors?: Array<{ name?: string; inepCode?: string; birthDate?: string; city?: string; email?: string; phone?: string }>;
   acceptedDeclaration?: boolean;
   imageUseConsent?: boolean;
@@ -20,13 +18,6 @@ export function getAgeInYears(birthDate: Date | string, referenceDate: Date | st
   const monthDiff = reference.getMonth() - birth.getMonth();
   if (monthDiff < 0 || (monthDiff === 0 && reference.getDate() < birth.getDate())) age -= 1;
   return age;
-}
-export function getTjrLevel(oldestAge: number): TjrLevel {
-  if (oldestAge < 0 || oldestAge > 19) throw new Error('Os integrantes devem ter até 19 anos na data da competição');
-  if (oldestAge <= 9) return 'LEVEL_1';
-  if (oldestAge <= 11) return 'LEVEL_2';
-  if (oldestAge <= 14) return 'LEVEL_3';
-  return 'LEVEL_4';
 }
 export function validateRegistration(payload: RegistrationPayload, documentCount = 0) {
   const stage = payload.stage; const institution = payload.institution; const responsible = payload.responsible;
@@ -41,7 +32,6 @@ export function validateRegistration(payload: RegistrationPayload, documentCount
   if (!team || !required(team.name) || !required(team.state) || !required(team.city)) throw new Error('Nome, estado e cidade da equipe são obrigatórios');
   const isGarage = Boolean(team.isGarage || !required(institution?.inepCode));
   if (!isGarage && !required(institution?.inepCode)) throw new Error('Informe o código INEP ou marque equipe de garagem');
-  if (!team.level || !TJR_LEVELS.includes(team.level)) throw new Error('Nível da equipe inválido');
   const modalities = team.modalities ?? [];
   if (modalities.length === 0 || modalities.some((modality) => !TJR_MODALITIES.includes(modality as Modality))) throw new Error('Selecione ao menos uma modalidade válida');
   if (new Set(modalities).size !== modalities.length) throw new Error('Não repita modalidades');
@@ -49,15 +39,12 @@ export function validateRegistration(payload: RegistrationPayload, documentCount
   if (documentCount !== competitors.length) throw new Error('Envie uma identidade para cada competidor');
   if (team.marketingCompetitorIndex !== null && team.marketingCompetitorIndex !== undefined && (!Number.isInteger(team.marketingCompetitorIndex) || team.marketingCompetitorIndex < 0 || team.marketingCompetitorIndex >= competitors.length)) throw new Error('Competidor de marketing inválido');
   const competitionDate = new Date(stage.competitionDate);
-  const ages = competitors.map((competitor) => {
+  competitors.forEach((competitor) => {
     if (!required(competitor.name) || !required(competitor.birthDate) || !required(competitor.city) || !required(competitor.email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(competitor.email ?? '') || !required(competitor.phone)) throw new Error('Nome, nascimento, cidade, e-mail e telefone são obrigatórios para todos os competidores');
     const age = getAgeInYears(competitor.birthDate!, competitionDate);
     if (age < 0 || age > 19) throw new Error('Todos os competidores devem ter até 19 anos na data da competição');
-    return age;
   });
-  const calculatedLevel = getTjrLevel(Math.max(...ages));
-  if (team.level !== calculatedLevel) throw new Error(`O nível correto para o integrante mais velho é ${calculatedLevel.replace('LEVEL_', 'Nível ')}`);
   if (payload.imageUseConsent !== true) throw new Error('É necessário autorizar o uso de imagem');
   if (payload.acceptedDeclaration !== true) throw new Error('É necessário aceitar a declaração da inscrição');
-  return { hasInstitution, isGarage, calculatedLevel };
+  return { hasInstitution, isGarage };
 }

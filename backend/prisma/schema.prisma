@@ -43,7 +43,7 @@ model Team {
   name                  String
   state                 String
   city                  String
-  level                 String
+  level                 String?
   modalities            String[]
   memberCount           Int                  @default(4)
   isGarage              Boolean              @default(false)
