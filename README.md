@@ -259,3 +259,26 @@ npm run dev
 ```
 
 Verifique as ligações em `http://localhost:3339/health`. O retorno esperado contém `database: "ok"` e `minio: "ok"`. O formulário envia o campo JSON `data` e os quatro arquivos no campo multipart `documents`; a API grava os dados no PostgreSQL e as identidades no bucket `identidades` do MinIO.
+
+## Stack completo com Docker
+
+Este repositório possui um Compose completo, incluindo aplicação e dependências:
+
+```bash
+docker compose up -d --build
+```
+
+Acompanhe a inicialização:
+
+```bash
+docker compose ps
+docker compose logs -f backend
+```
+
+O container do backend aplica `prisma migrate deploy` antes de iniciar a API. Para desligar sem remover dados:
+
+```bash
+docker compose down
+```
+
+Para apagar também os dados locais do PostgreSQL e MinIO, use `docker compose down -v` somente quando isso for intencional.

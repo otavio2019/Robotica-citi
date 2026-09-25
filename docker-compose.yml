@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: robotica-postgres
+    container_name: robotica-citi-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
@@ -13,13 +13,13 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d robotica"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   minio:
     image: quay.io/minio/minio:latest
-    container_name: robotica-minio
+    container_name: robotica-citi-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
@@ -32,9 +32,53 @@ services:
       - minio_data:/data
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: robotica-citi-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3339
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/robotica?schema=public
+      CORS_ORIGIN: http://localhost:3033
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_USE_SSL: "false"
+      MINIO_BUCKET: identidades
+    ports:
+      - "3339:3339"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3339/health"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:3339
+    container_name: robotica-citi-frontend
+    restart: unless-stopped
+    ports:
+      - "3033:3033"
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   postgres_data:
