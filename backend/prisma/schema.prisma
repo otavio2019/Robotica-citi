@@ -55,6 +55,7 @@ model Team {
   marketingCompetitorId String?              @unique
   marketingCompetitor   Competitor?          @relation("TeamMarketingCompetitor", fields: [marketingCompetitorId], references: [id])
   acceptedDeclaration   Boolean              @default(false)
+  imageUseConsent       Boolean              @default(false)
   acceptedAt            DateTime?
   stageName             String
   stageState            String

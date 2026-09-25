@@ -162,7 +162,7 @@ Payload mínimo:
     "state": "PB",
     "city": "Patos",
     "level": "LEVEL_4",
-    "modalities": ["SUMO", "VCT"]
+    "modalities": ["PISTA_RETA"]
   },
   "competitors": [
     { "name": "Ana", "birthDate": "2010-01-10" },

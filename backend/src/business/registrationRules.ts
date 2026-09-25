@@ -1,8 +1,5 @@
 // Catálogo fechado compartilhado pelo contrato do cadastro TJR.
-export const TJR_MODALITIES = [
-  'CABO_DE_GUERRA', 'DANCA_DE_ROBOS', 'MMA', 'REGISTRO_MULTIMIDIATICO',
-  'RESGATE_DE_ALTO_RISCO', 'RESGATE_NO_PLANO', 'SUMO', 'VCT', 'VCT_LABIRINTO_FINAL',
-] as const;
+export const TJR_MODALITIES = ['PISTA_RETA'] as const;
 export const TJR_LEVELS = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4'] as const;
 export type TjrLevel = (typeof TJR_LEVELS)[number];
 export type Modality = (typeof TJR_MODALITIES)[number];
@@ -13,6 +10,7 @@ export type RegistrationPayload = {
   team?: { name?: string; state?: string; city?: string; level?: TjrLevel; modalities?: string[]; isGarage?: boolean; marketingCompetitorIndex?: number | null };
   competitors?: Array<{ name?: string; inepCode?: string; birthDate?: string; city?: string; email?: string; phone?: string }>;
   acceptedDeclaration?: boolean;
+  imageUseConsent?: boolean;
 };
 const required = (value: unknown) => typeof value === 'string' && value.trim().length > 0;
 export function getAgeInYears(birthDate: Date | string, referenceDate: Date | string) {
@@ -36,8 +34,10 @@ export function validateRegistration(payload: RegistrationPayload, documentCount
   if (!required(stage?.name) || !required(stage?.state) || !required(stage?.venue) || !stage?.competitionDate) throw new Error('Etapa, estado, local e data da competição são obrigatórios');
   if (Number.isNaN(new Date(stage.competitionDate).getTime())) throw new Error('Data da competição inválida');
   if (!responsible || !required(responsible.fullName) || !required(responsible.document) || !required(responsible.email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(responsible.email ?? '') || !required(responsible.phone)) throw new Error('Nome, documento, e-mail e telefone do técnico são obrigatórios');
-  const hasInstitution = Boolean(institution && (required(institution.name) || required(institution.cnpj) || required(institution.inepCode)));
-  if (hasInstitution && (!required(institution?.name) || !required(institution?.cnpj))) throw new Error('Nome e CNPJ da instituição são obrigatórios');
+  const normalizedInstitutionCity = institution?.city?.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (!institution || !required(institution.name) || !required(institution.cnpj)) throw new Error('Nome e CNPJ da instituição são obrigatórios');
+  if (normalizedInstitutionCity !== 'patos' || institution.isPatos !== true) throw new Error('A instituição deve ser de Patos-PB');
+  const hasInstitution = true;
   if (!team || !required(team.name) || !required(team.state) || !required(team.city)) throw new Error('Nome, estado e cidade da equipe são obrigatórios');
   const isGarage = Boolean(team.isGarage || !required(institution?.inepCode));
   if (!isGarage && !required(institution?.inepCode)) throw new Error('Informe o código INEP ou marque equipe de garagem');
@@ -57,6 +57,7 @@ export function validateRegistration(payload: RegistrationPayload, documentCount
   });
   const calculatedLevel = getTjrLevel(Math.max(...ages));
   if (team.level !== calculatedLevel) throw new Error(`O nível correto para o integrante mais velho é ${calculatedLevel.replace('LEVEL_', 'Nível ')}`);
+  if (payload.imageUseConsent !== true) throw new Error('É necessário autorizar o uso de imagem');
   if (payload.acceptedDeclaration !== true) throw new Error('É necessário aceitar a declaração da inscrição');
   return { hasInstitution, isGarage, calculatedLevel };
 }

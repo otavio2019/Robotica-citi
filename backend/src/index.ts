@@ -87,7 +87,7 @@ async function registrationHandler(req: express.Request, res: express.Response, 
           name: rawData.team!.name!.trim(), state: rawData.team!.state!.trim().toUpperCase(), city: rawData.team!.city!.trim(),
           level: rawData.team!.level!, modalities: rawData.team!.modalities!, memberCount: rawData.competitors!.length,
           isGarage: registration.isGarage, institutionId: institution?.id, responsibleId: responsible.id,
-          acceptedDeclaration: true, acceptedAt: new Date(), stageName: rawData.stage!.name!.trim(), stageState: rawData.stage!.state!.trim().toUpperCase(),
+          acceptedDeclaration: true, imageUseConsent: rawData.imageUseConsent === true, acceptedAt: new Date(), stageName: rawData.stage!.name!.trim(), stageState: rawData.stage!.state!.trim().toUpperCase(),
           stageVenue: rawData.stage!.venue!.trim(), competitionDate: new Date(rawData.stage!.competitionDate!),
         },
       });
