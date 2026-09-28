@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 // Metadados usados pelo navegador e pelos mecanismos de compartilhamento.
 export const metadata: Metadata = {
-  title: "Inscrição TJR — Robótica",
+  title: "Inscrição Patos Tech — Robótica",
   description: "Formulário de inscrição do Torneio Juvenil de Robótica",
 };
 

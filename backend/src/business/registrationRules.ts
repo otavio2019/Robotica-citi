@@ -1,6 +1,6 @@
-// Catálogo fechado compartilhado pelo contrato do cadastro TJR.
-export const TJR_MODALITIES = ['SEGUIR_LINHA'] as const;
-export type Modality = (typeof TJR_MODALITIES)[number];
+// Catálogo fechado compartilhado pelo contrato do cadastro Patos Tech.
+export const PATOS_TECH_MODALITIES = ['SEGUIR_LINHA'] as const;
+export type Modality = (typeof PATOS_TECH_MODALITIES)[number];
 export type RegistrationPayload = {
   stage?: { name?: string; state?: string; venue?: string; competitionDate?: string };
   institution?: { name?: string; cnpj?: string; inepCode?: string; city?: string; instagramUrl?: string; isPatos?: boolean };
@@ -33,7 +33,7 @@ export function validateRegistration(payload: RegistrationPayload, documentCount
   const isGarage = Boolean(team.isGarage || !required(institution?.inepCode));
   if (!isGarage && !required(institution?.inepCode)) throw new Error('Informe o código INEP ou marque equipe de garagem');
   const modalities = team.modalities ?? [];
-  if (modalities.length === 0 || modalities.some((modality) => !TJR_MODALITIES.includes(modality as Modality))) throw new Error('Selecione ao menos uma modalidade válida');
+  if (modalities.length === 0 || modalities.some((modality) => !PATOS_TECH_MODALITIES.includes(modality as Modality))) throw new Error('Selecione ao menos uma modalidade válida');
   if (new Set(modalities).size !== modalities.length) throw new Error('Não repita modalidades');
   if (competitors.length < 3 || competitors.length > 4) throw new Error('A equipe deve possuir entre 3 e 4 integrantes');
   if (documentCount !== competitors.length) throw new Error('Envie uma identidade para cada competidor');

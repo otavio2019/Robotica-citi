@@ -1,6 +1,6 @@
-# Cadastro TJR — Robótica CiTI-DE
+# Cadastro Patos Tech — Robótica CiTI-DE
 
-Sistema de inscrição de equipes para o **Torneio Juvenil de Robótica (TJR)**. O projeto possui frontend Next.js, API Express, PostgreSQL com Prisma e armazenamento de identidades no MinIO.
+Sistema de inscrição de equipes para o **Patos Tech**. O projeto possui frontend Next.js, API Express, PostgreSQL com Prisma e armazenamento de identidades no MinIO.
 
 ## Regras atuais do cadastro
 
@@ -145,7 +145,7 @@ Exemplo de dados:
 ```json
 {
   "stage": {
-    "name": "TJR — Paraíba",
+    "name": "Patos Tech — Paraíba",
     "state": "PB",
     "venue": "Ginásio Municipal",
     "competitionDate": "2026-10-01"

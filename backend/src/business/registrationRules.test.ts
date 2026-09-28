@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getAgeInYears, validateRegistration } from './registrationRules';
 const validPayload = {
-  stage: { name: 'TJR — Paraíba', state: 'PB', venue: 'Ginásio', competitionDate: '2026-10-01' },
+  stage: { name: 'Patos Tech — Paraíba', state: 'PB', venue: 'Ginásio', competitionDate: '2026-10-01' },
   institution: { name: 'Escola A', cnpj: '12.345.678/0001-90', inepCode: '25000000', city: 'Patos', isPatos: true },
   responsible: { fullName: 'Maria da Silva', document: '12345678900', inepCode: '25000000', email: 'maria@email.com', phone: '88999999999' },
   team: { name: 'Equipe A', state: 'PB', city: 'Patos', modalities: ['SEGUIR_LINHA'], marketingCompetitorIndex: 0 },
@@ -14,7 +14,7 @@ const validPayload = {
   acceptedDeclaration: true,
   imageUseConsent: true,
 };
-describe('regras do cadastro TJR', () => {
+describe('regras do cadastro Patos Tech', () => {
   it('calcula idade', () => { expect(getAgeInYears('2010-01-01', '2026-10-01')).toBe(16); });
   it('aceita uma inscrição válida com quatro competidores', () => expect(() => validateRegistration(validPayload, 4)).not.toThrow());
   it('aceita equipe de garagem sem INEP em instituição de Patos', () => expect(validateRegistration({ ...validPayload, team: { ...validPayload.team, isGarage: true } }, 4).isGarage).toBe(true));
